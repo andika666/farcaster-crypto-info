@@ -1,0 +1,29 @@
+// pages/frames/crypto.js
+import { getFrameHtmlResponse } from '@neynar/nodejs-sdk/build/utils.js';
+
+export const config = {
+  runtime: 'edge',
+};
+
+export default async function handler(req) {
+  const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd&include_24hr_change=true');
+  const data = await res.json();
+
+  const btc = data.bitcoin.usd;
+  const eth = data.ethereum.usd;
+  const sol = data.solana.usd;
+
+  return new Response(
+    getFrameHtmlResponse({
+      title: "🌍 Crypto Info",
+      image: `https://dummyimage.com/600x400/000/fff&text=BTC:$${btc} | ETH:$${eth} | SOL:$${sol}`,
+      buttons: [
+        { label: '🔄 Refresh', action: 'post', target: '/frames/crypto' },
+        { label: '💡 Source', action: 'link', target: 'https://www.coingecko.com' }
+      ],
+    }),
+    {
+      headers: { 'Content-Type': 'text/html' },
+    }
+  );
+}
